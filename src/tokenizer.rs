@@ -210,9 +210,15 @@ impl Tokenizer {
                 // get the first match
                 let first_match = regex.find(&input[index..]);
 
-                // if we have a match...
-                if first_match.is_ok() && let match_optional = first_match.unwrap() && match_optional.is_some() {
 
+                // if we have a match...
+                if first_match.is_ok() {
+
+                    let match_optional = first_match.unwrap();
+
+                    if !match_optional.is_some() {
+                        continue;
+                    }
 
                     has_match = true;
 
