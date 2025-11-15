@@ -1,9 +1,8 @@
-use std::any::Any;
 use fancy_regex::Regex;
 use crate::tokenizer::Token::Whitespace;
-// TODO: Cull this list
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum Token {
     Whitespace,
     LineBreak { index: i128 },
@@ -154,6 +153,7 @@ lazy_static::lazy_static! {
         token!(r">>", |index, _| Token::BitshiftRight { index }),
         token!(r">", |index, _| Token::GreaterThan { index }),
         token!(r"<<", |index, _| Token::BitShiftLeft { index }),
+        token!(r"<", |index, _| Token::LessThan { index }),
 
         // keywords / literals
         token!(r"null", |index, _| Token::Null { index }),
@@ -167,7 +167,7 @@ lazy_static::lazy_static! {
         token!(r"as", |index, _| Token::As { index }),
         token!(r"for", |index, _| Token::For { index }),
         token!(r"while", |index, _| Token::While { index }),
-        token!(r"on_loop", |index, _| Token::While { index }),
+        token!(r"on_loop", |index, _| Token::OnLoop { index }),
         token!(r"break", |index, _| Token::Break { index }),
         token!(r"continue", |index, _| Token::Continue { index }),
         token!(r"if", |index, _| Token::If { index }),
@@ -181,12 +181,7 @@ lazy_static::lazy_static! {
     ];
 }
 
-
-pub struct Tokenizer {
-
-
-
-}
+pub struct Tokenizer {}
 
 impl Tokenizer {
     pub(crate) fn tokenize(input: &str) -> Vec<Token> {
@@ -197,7 +192,7 @@ impl Tokenizer {
         let mut tokens: Vec<Token> = vec![];
 
         // while there is still file left to parse
-        while (index < input.len()) {
+        while index < input.len() {
             let mut has_match = false;
 
             // for every token we know about
@@ -234,7 +229,7 @@ impl Tokenizer {
                     index += match_str.end() - match_str.start();
 
                     // we dont care about whitespace or linebreaks
-                    if (!(matches!(token, Whitespace) || matches!(token, Token::LineBreak {..}))) {
+                    if !(matches!(token, Whitespace) || matches!(token, Token::LineBreak {..})) {
                         // add tokens to list
                         tokens.push(token);
                     }

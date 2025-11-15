@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "asexp"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e368761ce758947307f1c2db1f46077b1aabb5af7f268b6cededd1b52802652"
+
+[[package]]
 name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -27,12 +33,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
 
 [[package]]
-name = "capstone"
-version = "0.1.0"
+name = "expression"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa8fb8f34a561097fde30176dbdcd788dcb32f0975401d2c6193995f426abeb3"
 dependencies = [
- "fancy-regex",
- "lazy_static",
- "regex",
+ "asexp",
 ]
 
 [[package]]
@@ -51,6 +57,16 @@ name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
+
+[[package]]
+name = "malang"
+version = "0.1.0"
+dependencies = [
+ "expression",
+ "fancy-regex",
+ "lazy_static",
+ "regex",
+]
 
 [[package]]
 name = "memchr"

@@ -1,13 +1,20 @@
 mod tokenizer;
+mod parser;
 
 use std::collections::HashSet;
 use std::fs;
 use regex::Regex;
+use crate::parser::Parser;
 use crate::tokenizer::Tokenizer;
 
 fn main() {
 
-    Tokenizer::tokenize("let x: int = 5.05;");
+    let tokens = Tokenizer::tokenize("let x: int = 5.05;");
+    let parser: Parser = Parser::from_tokens(tokens);
+    match parser.parse() {
+       Ok(statements) => { println!("{:?}", statements); }
+        Err(e) => { println!("failed: {}", e); }
+    }
 
     let data =  read_malware_program("./.mal-scripts/example.mal").unwrap();
     Tokenizer::tokenize(&*data);
@@ -58,7 +65,7 @@ fn output_to_file(includes: HashSet<Include>, main_content: String) -> std::io::
 
     let formatted_includes = includes.iter()
         .map(|x| format!("#include {}", x.to_string()))
-        .collect::<Vec<String>>()
+        .collect::<Vec<Include>>()
         .join("\n");
 
     // println!("{}", formatted_includes);

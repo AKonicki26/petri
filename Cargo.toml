@@ -1,5 +1,5 @@
 [package]
-name = "capstone"
+name = "malang"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,3 +7,4 @@ edition = "2024"
 regex = "1.11.3"
 lazy_static = "1.5.0"
 fancy-regex = "0.16.2"
+expression = "0.3.4"
