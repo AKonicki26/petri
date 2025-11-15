@@ -71,7 +71,7 @@ pub enum Token {
     LessThan { index: i128 },
 
     // End of File
-    EOF,
+    Eof,
 }
 
 trait StringExt {
@@ -105,8 +105,10 @@ macro_rules! token {
     };
 }
 
+type TokenCreator = fn(i128, String) -> Token;
+
 lazy_static::lazy_static! {
-    pub static ref TOKEN_CONVERTERS: Vec<(Regex, fn(i128, String) -> Token)> = vec![
+    pub static ref TOKEN_CONVERTERS: Vec<(Regex, TokenCreator)> = vec![
         token!(r"[ \t]+", |_, _| Token::Whitespace),
         token!(r"\r?\n", |index, _| Token::LineBreak { index }),
         token!(r"//(.*?)(?=\r?\n|$)", |index, val| Token::Comment { index, value: val[2..].to_string() }),
@@ -202,9 +204,7 @@ impl Tokenizer {
                 let first_match = regex.find(&input[index..]);
 
                 // if we have a match...
-                if first_match.is_ok() {
-                    let match_optional = first_match.unwrap();
-
+                if let Ok(match_optional) = first_match {
                     if match_optional.is_none() {
                         continue;
                     }
@@ -243,7 +243,7 @@ impl Tokenizer {
         println!("Tokenizer finished: {:?}", tokens);
 
         // add the end of file token
-        tokens.push(Token::EOF);
+        tokens.push(Token::Eof);
         // return list of tokens
         tokens
     }

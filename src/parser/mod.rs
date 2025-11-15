@@ -5,11 +5,13 @@ mod expression;
 mod statement;
 
 pub struct Parser {
+    #[allow(unused)]
     tokens: Vec<Token>,
 }
 
 type StatementList = Vec<Box<dyn Statement>>;
 impl Parser {
+    #[allow(unused)]
     pub fn new() -> Self {
         Self { tokens: vec![] }
     }

@@ -21,12 +21,15 @@ fn main() {
 
     let data = read_malware_program("./.mal-scripts/example.mal").unwrap();
     Tokenizer::tokenize(&data);
-    /*
+
     match generate_malware() {
-        Ok(()) => { println!("done"); }
-        Err(e) => { println!("failed: {}", e); }
+        Ok(()) => {
+            println!("done");
+        }
+        Err(e) => {
+            println!("failed: {}", e);
+        }
     }
-    */
 }
 
 type Include = String;
