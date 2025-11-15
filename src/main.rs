@@ -19,7 +19,7 @@ fn main() {
         }
     }
 
-    let data = read_malware_program("./.mal-scripts/example.mal").unwrap();
+    let data = read_malware_program("./.petri-scripts/example.ptri").unwrap();
     Tokenizer::tokenize(&data);
 
     match generate_malware() {
