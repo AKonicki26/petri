@@ -1,15 +1,45 @@
-use crate::tokenizer::Token::Whitespace;
 use fancy_regex::Regex;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct CommentData {index: i128, value: String }
+
+impl CommentData {
+    pub fn new(index: i128, value: String) -> Self {
+        Self { index, value }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct StringLiteralData  {index: i128, value: String }
+impl StringLiteralData {
+    pub fn new(index: i128, value: String) -> Self {
+        Self { index, value }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct NumberLiteralData  {index: i128, value: f64 }
+
+impl NumberLiteralData {
+    pub fn new(index: i128, value: f64) -> Self {
+        Self { index, value }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct IdentifierData  {index: i128, value: String }
+impl IdentifierData {
+    pub fn new(index: i128, value: String) -> Self {
+        Self { index, value }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum Token {
     Whitespace,
     LineBreak { index: i128 },
-    Comment { index: i128, value: String },
-    StringLiteral { index: i128, value: String },
-    NumberLiteral { index: i128, value: f64 },
-    Identifier { index: i128, value: String },
+    Comment (CommentData),
+    StringLiteral (StringLiteralData),
+    NumberLiteral (NumberLiteralData),
+    Identifier (IdentifierData),
 
     // keywords / literals
     Null { index: i128 },
@@ -74,6 +104,7 @@ pub enum Token {
     Eof,
 }
 
+
 trait StringExt {
     fn remove_first_and_last(self) -> String;
 }
@@ -86,24 +117,31 @@ impl StringExt for String {
     }
 }
 
+// macro to create regexes that start at the beginning of a line
+macro_rules! start_regex {
+    ($regex:expr) => {
+        Regex::new(concat!("^", $regex)).unwrap()
+    };
+}
+
+// macro for generating token creators from regex
 macro_rules! token {
     // Version for when no variables are used
     ($regex: expr, |_, _| $body:expr) => {
-        (Regex::new($regex).unwrap(), |_, _| $body)
+        (start_regex!($regex), |_, _| $body)
     };
 
     // Version for when only one variable is used
     ($regex: expr, |$index:ident, _| $body:expr) => {
-        (Regex::new($regex).unwrap(), |$index: i128, _| $body)
+        (start_regex!($regex), |$index: i128, _| $body)
     };
 
     // Version for when both variables are used
     ($regex:expr, |$index:ident, $val:ident| $body:expr) => {
-        (Regex::new($regex).unwrap(), |$index: i128, $val: String| {
-            $body
-        })
+        (start_regex!($regex), |$index: i128, $val: String| $body)
     };
 }
+
 
 type TokenCreator = fn(i128, String) -> Token;
 
@@ -111,11 +149,11 @@ lazy_static::lazy_static! {
     pub static ref TOKEN_CONVERTERS: Vec<(Regex, TokenCreator)> = vec![
         token!(r"[ \t]+", |_, _| Token::Whitespace),
         token!(r"\r?\n", |index, _| Token::LineBreak { index }),
-        token!(r"//(.*?)(?=\r?\n|$)", |index, val| Token::Comment { index, value: val[2..].to_string() }),
-        token!(r#""[^"\r\n]+""#, |index, val| Token::StringLiteral { index, value: val.remove_first_and_last() }),
-        token!(r#"'[^'\r\n]+'"#, |index, val| Token::StringLiteral { index, value: val.remove_first_and_last() }),
-        token!(r#"`[^`]+`"#, |index, val| Token::StringLiteral { index, value: val.remove_first_and_last() }),
-        token!(r"-?[0-9]+\.?[0-9]*(?![a-zA-Z$_])", |index, val| Token::NumberLiteral { index, value: val.parse::<f64>().unwrap() }),
+        token!(r"//(.*?)(?=\r?\n|$)", |index, val| Token::Comment(CommentData::new(index, val[2..].to_string() ))),
+        token!(r#""[^"\r\n]+""#, |index, val| Token::StringLiteral(StringLiteralData::new(index, val.remove_first_and_last() ))),
+        token!(r#"'[^'\r\n]+'"#, |index, val| Token::StringLiteral(StringLiteralData::new(index, val.remove_first_and_last() ))),
+        token!(r#"`[^`]+`"#, |index, val| Token::StringLiteral(StringLiteralData::new(index, val.remove_first_and_last() ))),
+        token!(r"-?[0-9]+\.?[0-9]*(?![a-zA-Z$_])", |index, val| Token::NumberLiteral(NumberLiteralData::new(index, val.parse::<f64>().unwrap() ))),
         //token!(r"^\d*.\d+", |index, val| Token::DecimalLiteral { index, value: val.parse::<f64>().unwrap() }),
 
         // punctuation / symbols
@@ -178,73 +216,6 @@ lazy_static::lazy_static! {
         token!(r"const", |index, _| Token::Const { index }),
 
         // generic identifier last (catch-all)
-        token!(r"[a-zA-Z$_][a-zA-Z0-9$_]*", |index, val| Token::Identifier { index, value: val }),
+        token!(r"[a-zA-Z$_][a-zA-Z0-9$_]*", |index, val| Token::Identifier(IdentifierData::new(index, val))),
     ];
-}
-
-pub struct Tokenizer {}
-
-impl Tokenizer {
-    pub(crate) fn tokenize(input: &str) -> Vec<Token> {
-        println!("Tokenizing \"{}\"...", input);
-
-        let mut index = 0;
-        let mut tokens: Vec<Token> = vec![];
-
-        // while there is still file left to parse
-        while index < input.len() {
-            let mut has_match = false;
-
-            // for every token we know about
-            for (r, creator) in TOKEN_CONVERTERS.iter() {
-                // make each regex the start of the line (only test the start of input)
-                let regex = Regex::new(&(r"^".to_string() + &*r.to_string())).unwrap();
-
-                // get the first match
-                let first_match = regex.find(&input[index..]);
-
-                // if we have a match...
-                if let Ok(match_optional) = first_match {
-                    if match_optional.is_none() {
-                        continue;
-                    }
-
-                    has_match = true;
-
-                    // get the token from the match
-                    //println!("Testing regex: {}", r.to_string());
-                    let match_str = match_optional.unwrap();
-
-                    //println!("Match: {}", match_str.as_str());
-                    let token = creator(index as i128, match_str.as_str().parse().unwrap());
-                    //println!("{}", regex.replace(&input, format!("[{:?}]", token)));
-
-                    // increase the index by how much we moves
-                    index += match_str.end() - match_str.start();
-
-                    // we dont care about whitespace or linebreaks
-                    if !(matches!(token, Whitespace) || matches!(token, Token::LineBreak { .. })) {
-                        // add tokens to list
-                        tokens.push(token);
-                    }
-                    break;
-                } else {
-                    // println!("regex not found")
-                }
-            }
-
-            // if no tokens match, error
-            if !has_match {
-                println!("No match found for: {}", &input[index..]);
-                break;
-            }
-        }
-
-        println!("Tokenizer finished: {:?}", tokens);
-
-        // add the end of file token
-        tokens.push(Token::Eof);
-        // return list of tokens
-        tokens
-    }
 }

@@ -1,5 +1,5 @@
 use crate::parser::statement::Statement;
-use crate::tokenizer::Token;
+use crate::tokenizer::tokens::Token;
 
 mod expression;
 mod statement;

@@ -35,7 +35,7 @@ fn main() {
 type Include = String;
 
 fn generate_malware() -> std::io::Result<()> {
-    let data = read_malware_program("./.mal-scripts/example.mal").unwrap();
+    let data = read_malware_program("./.petri-scripts/example.ptri").unwrap();
 
     println!("data: {:?}", data);
 
