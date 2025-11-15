@@ -1,4 +1,3 @@
-use crate::parser;
 use crate::parser::statement::Statement;
 use crate::tokenizer::Token;
 

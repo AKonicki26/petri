@@ -199,7 +199,7 @@ impl Tokenizer {
             for (r, creator) in TOKEN_CONVERTERS.iter() {
 
                 // make each regex the start of the line (only test the start of input)
-                let regex = Regex::new(&*(r"^".to_string() + &*r.to_string())).unwrap();
+                let regex = Regex::new(&(r"^".to_string() + &*r.to_string())).unwrap();
 
 
                 // get the first match
@@ -211,7 +211,7 @@ impl Tokenizer {
 
                     let match_optional = first_match.unwrap();
 
-                    if !match_optional.is_some() {
+                    if match_optional.is_none() {
                         continue;
                     }
 

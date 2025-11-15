@@ -17,7 +17,7 @@ fn main() {
     }
 
     let data =  read_malware_program("./.mal-scripts/example.mal").unwrap();
-    Tokenizer::tokenize(&*data);
+    Tokenizer::tokenize(&data);
     /*
     match generate_malware() {
         Ok(()) => { println!("done"); }
@@ -64,7 +64,7 @@ fn read_malware_program(file_name: &str) -> Result<String, String> {
 fn output_to_file(includes: HashSet<Include>, main_content: String) -> std::io::Result<()> {
 
     let formatted_includes = includes.iter()
-        .map(|x| format!("#include {}", x.to_string()))
+        .map(|x| format!("#include {}", x))
         .collect::<Vec<Include>>()
         .join("\n");
 
