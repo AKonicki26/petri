@@ -3,7 +3,6 @@ pub(crate) mod tokens;
 use crate::tokenizer::tokens::*;
 use Token::Whitespace;
 
-
 pub struct Tokenizer {}
 
 impl Tokenizer {

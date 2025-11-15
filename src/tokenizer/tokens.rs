@@ -1,7 +1,10 @@
 use fancy_regex::Regex;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct CommentData {index: i128, value: String }
+pub struct CommentData {
+    index: i128,
+    value: String,
+}
 
 impl CommentData {
     pub fn new(index: i128, value: String) -> Self {
@@ -9,7 +12,10 @@ impl CommentData {
     }
 }
 #[derive(Debug, Clone, PartialEq)]
-pub struct StringLiteralData  {index: i128, value: String }
+pub struct StringLiteralData {
+    index: i128,
+    value: String,
+}
 impl StringLiteralData {
     pub fn new(index: i128, value: String) -> Self {
         Self { index, value }
@@ -17,7 +23,10 @@ impl StringLiteralData {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct NumberLiteralData  {index: i128, value: f64 }
+pub struct NumberLiteralData {
+    index: i128,
+    value: f64,
+}
 
 impl NumberLiteralData {
     pub fn new(index: i128, value: f64) -> Self {
@@ -25,7 +34,10 @@ impl NumberLiteralData {
     }
 }
 #[derive(Debug, Clone, PartialEq)]
-pub struct IdentifierData  {index: i128, value: String }
+pub struct IdentifierData {
+    index: i128,
+    value: String,
+}
 impl IdentifierData {
     pub fn new(index: i128, value: String) -> Self {
         Self { index, value }
@@ -36,10 +48,10 @@ impl IdentifierData {
 pub enum Token {
     Whitespace,
     LineBreak { index: i128 },
-    Comment (CommentData),
-    StringLiteral (StringLiteralData),
-    NumberLiteral (NumberLiteralData),
-    Identifier (IdentifierData),
+    Comment(CommentData),
+    StringLiteral(StringLiteralData),
+    NumberLiteral(NumberLiteralData),
+    Identifier(IdentifierData),
 
     // keywords / literals
     Null { index: i128 },
@@ -104,7 +116,6 @@ pub enum Token {
     Eof,
 }
 
-
 trait StringExt {
     fn remove_first_and_last(self) -> String;
 }
@@ -141,7 +152,6 @@ macro_rules! token {
         (start_regex!($regex), |$index: i128, $val: String| $body)
     };
 }
-
 
 type TokenCreator = fn(i128, String) -> Token;
 
