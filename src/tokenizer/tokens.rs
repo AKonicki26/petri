@@ -1,3 +1,4 @@
+use std::mem::Discriminant;
 use fancy_regex::Regex;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -114,6 +115,12 @@ pub enum Token {
 
     // End of File
     Eof,
+}
+
+impl Token {
+    pub fn discriminant(&self) -> Discriminant<Token> {
+        std::mem::discriminant(self)
+    }
 }
 
 trait StringExt {

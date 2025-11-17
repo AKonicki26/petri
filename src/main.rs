@@ -9,7 +9,7 @@ use std::fs;
 
 fn main() {
     let tokens = Tokenizer::tokenize("let x: int = 5.05;");
-    let parser: Parser = Parser::from_tokens(tokens);
+    let mut parser: Parser = Parser::from_tokens(tokens);
     match parser.parse() {
         Ok(statements) => {
             println!("{:?}", statements);
